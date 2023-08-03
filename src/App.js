@@ -1,25 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import PokemonList from '../src/components/pokemon-list';
+import PokemonDetails from '../src/components/pokemon-details';
+import { Title, Container, PokemonListContainer, Wrapper } from "./components/global-styles/styles";
+import { Select } from "./components/pokemon-list/styles";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const [types, setTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
+
+    const fetchPokemonTypes = async () => {
+        try {
+            const response = await fetch('https://pokeapi.co/api/v2/type?limit=999');
+            const data = await response.json();
+            setTypes(data.results);
+        } catch (error) {
+            console.error('Error fetching Pokemon types:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchPokemonTypes();
+    }, []);
+
+    const handlePokemonClick = (pokemon) => {
+        setSelectedPokemon(pokemon);
+    };
+
+    const handleSelectChange = (e) => {
+        setSelectedType(e.target.value);
+    };
+
+    return (
+        <Container>
+            <Wrapper>
+                <Title>Pokedex</Title>
+                <Select value={selectedType} onChange={handleSelectChange}>
+                    <option value="">All Types</option>
+                    {types.map((type) => (
+                        <option key={type.name} value={type.name}>
+                            {type.name}
+                        </option>
+                    ))}
+                </Select>
+            </Wrapper>
+            <PokemonListContainer>
+                <PokemonList selectedType={selectedType} onPokemonClick={handlePokemonClick} />
+                {selectedPokemon && (
+                    <PokemonDetails selectedPokemon={selectedPokemon} />
+                )}
+            </PokemonListContainer>
+        </Container>
+    );
+};
 
 export default App;
