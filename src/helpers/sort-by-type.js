@@ -4,4 +4,5 @@ export const filterPokemonByType = (pokemonList, type) => {
     }
 
     return pokemonList.filter((pokemon) => pokemon.types.some(({ type: { name } }) => name === type));
+
 };
